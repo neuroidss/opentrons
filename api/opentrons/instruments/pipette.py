@@ -20,6 +20,7 @@ PLUNGER_POSITIONS = {
     'drop_tip': -7
 }
 
+from opentrons.robot.movement_actions import move_instrument_to
 
 class PipetteTip:
     def __init__(self, length):
