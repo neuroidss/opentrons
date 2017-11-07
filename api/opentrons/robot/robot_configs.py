@@ -83,6 +83,7 @@ Rosalind = robot_config(
     steps_per_mm='M92 X80.0254 Y80.16 Z400 A400 B768 C768',
     max_speeds='M203.1 X300 Y200 Z50 A50 B8 C8',
     acceleration='M204 S10000 X4000 Y3000 Z2000 A2000 B3000 C3000',
+<<<<<<< HEAD
     current='M907 X1.2 Y1.5 Z0.8 A0.8 B{0} C{0}'.format(PLUNGER_CURRENT_LOW),
     deck_offset=None,
     probe_center=(287, 295, 55.0),
