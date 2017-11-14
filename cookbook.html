@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>How to Calibrate &#8212; Opentrons API v2.0</title>
+    <title>Protocol Cookbook &#8212; Opentrons API v2.0</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -29,8 +29,8 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Opentrons API v2.0" href="index.html" />
-    <link rel="next" title="Firmware Updates" href="firmware.html" />
-    <link rel="prev" title="API Reference" href="api.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Hardware Modules" href="modules.html" />
  
 <link rel="stylesheet" href="_static/custom.css" type="text/css" />  
 <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -145,91 +145,64 @@ window.intercomSettings = {
         <div class="bodywrapper">
             <div class="body" role="main">
                 
-  <div class="section" id="how-to-calibrate">
-<span id="calibration"></span><h1>How to Calibrate<a class="headerlink" href="#how-to-calibrate" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="download-app">
-<h2>Download App<a class="headerlink" href="#download-app" title="Permalink to this headline">¶</a></h2>
-<p>You can download the latest version of the app from <a class="reference external" href="https://opentrons.com/getting-started/download-app">our website</a>.</p>
-</div>
-<div class="section" id="connect-to-robot">
-<h2>Connect to Robot<a class="headerlink" href="#connect-to-robot" title="Permalink to this headline">¶</a></h2>
-<p>Make sure your robot is turned on, and your laptop is connected via USB cable.</p>
-<p>Go to the select port drop down, and refresh if no ports are shown.  Once the port shows up, click it and the robot will jog up and down.</p>
-<img alt="_images/ports.png" src="_images/ports.png" />
-<img alt="_images/connected.png" src="_images/connected.png" />
-<div class="admonition important">
-<p class="first admonition-title">Important</p>
-<p class="last">Every time you connect to the robot, you need to home all axes before doing anything else.</p>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Linux users will need to get permission to open the robot&#8217;s serial port. This requires <cite>sudo</cite> privileges.
-In a terminal window, run the following command</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo usermod -a -G dialout USER_NAME_HERE
+  <div class="section" id="protocol-cookbook">
+<span id="cookbook"></span><h1>Protocol Cookbook<a class="headerlink" href="#protocol-cookbook" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="plate-well-filling-with-8-channel-pipette">
+<h2>384 Plate Well Filling with 8-channel pipette<a class="headerlink" href="#plate-well-filling-with-8-channel-pipette" title="Permalink to this headline">¶</a></h2>
+<p>In the Opentrons API, the clearest way to direct an 8-channel pipette to a location
+is to use <code class="docutils literal"><span class="pre">myContainer.rows(row_number)</span></code>, which returns a <code class="docutils literal"><span class="pre">WellSeries</span></code> object
+representing all the wells in a row.</p>
+<p>For a 96-well plate, you can simply specify <code class="docutils literal"><span class="pre">my96Plate.rows(row_number)</span></code>, which will
+represent all 8 wells in that row.</p>
+<p>However, for a 384-well plate, an 8-channel pipette will fit into <strong>every other well</strong> in a row.
+The 8-channel can fit into A1 C1 E1 G1 I1 K1 M1 O1 of a 384-well plate, not A1 B1 C1 etc.</p>
+<p><code class="docutils literal"><span class="pre">my384Plate.rows(row_number)</span></code> will represent all 16 wells in a row.
+To get every other well starting from the A column, we can do <code class="docutils literal"><span class="pre">row.wells('A',</span> <span class="pre">length=8,</span> <span class="pre">step=2)</span></code>.
+And to get every other well starting from the B column, do <code class="docutils literal"><span class="pre">row.wells('B',</span> <span class="pre">length=8,</span> <span class="pre">step=2)</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="k">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">instruments</span>
+
+<span class="n">plate</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;384-plate&#39;</span><span class="p">,</span> <span class="s1">&#39;B1&#39;</span><span class="p">)</span>
+<span class="n">trough</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;trough-12row&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+
+<span class="n">tiprack_1</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tiprack-200ul&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">)</span>
+<span class="n">trash</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;trash-box&#39;</span><span class="p">,</span> <span class="s1">&#39;E1&#39;</span><span class="p">)</span>
+
+<span class="n">p200</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">Pipette</span><span class="p">(</span>
+    <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack_1</span><span class="p">],</span>
+    <span class="n">trash_container</span><span class="o">=</span><span class="n">trash</span><span class="p">)</span>
+
+<span class="c1"># create a list of alternating wells for each row,</span>
+<span class="c1"># first starting from A then starting from B:</span>
+<span class="c1"># [A1-O1, B1-P1, A2-O2, B2-P2, A3-O3, B3-P3, ...]</span>
+
+<span class="n">alternating_wells</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">plate</span><span class="o">.</span><span class="n">rows</span><span class="p">():</span>
+    <span class="n">alternating_wells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">alternating_wells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># to transfer from the trough to every well in the 384 plate:</span>
+<span class="n">p200</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">trough</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">alternating_wells</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Where USER_NAME_HERE is the name of account that will be running the App.</p>
-<p class="last">Finally, logout and log back in as the user to activate the change.</p>
+<div class="section" id="dispensing-at-the-bottom-while-filling-a-384-plate">
+<h3>Dispensing at the bottom while filling a 384 plate<a class="headerlink" href="#dispensing-at-the-bottom-while-filling-a-384-plate" title="Permalink to this headline">¶</a></h3>
+<p>To dispense at the <strong>bottom</strong> of every well in the 384 plate,
+we can take the first well from each row and use the <code class="docutils literal"><span class="pre">Well.bottom()</span></code> method
+to specify the bottom of the well.</p>
+<p>In the Opentrons API, when you give an 8-channel pipette a single well
+instead of a WellSeries row, the pipette will place its <strong>leftmost</strong> channel
+in the well you specify.</p>
+<p>For a 384 plate, you should specify all the A and B wells. Since we already have
+alternating rows, we will take the first well in each row and specify to use that well&#8217;s
+bottom with <code class="docutils literal"><span class="pre">.bottom()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">alternating_well_bottoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">alternating_wells</span><span class="p">]</span>
+
+<span class="n">p200</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">trough</span><span class="o">.</span><span class="n">wells</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">),</span> <span class="n">alternating_well_bottoms</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
-<div class="section" id="upload-protocol">
-<h2>Upload Protocol<a class="headerlink" href="#upload-protocol" title="Permalink to this headline">¶</a></h2>
-<p>Your <code class="docutils literal"><span class="pre">.py</span></code> protocol file can load into the App, through either clicking the &#8220;Upload&#8221; button, or drag-and-drop the <code class="docutils literal"><span class="pre">.py</span></code> file over that same button.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Make sure that when saving a protocol file, it ends with the <code class="docutils literal"><span class="pre">.py</span></code> file extension. This will ensure the App and other programs are able to properly read it.</p>
-<p class="last">For example, <code class="docutils literal"><span class="pre">my_protocol_file.py</span></code></p>
-</div>
-<p>If successfully loaded, your Python protocol will be simulated in the background to detect any errors. While this is happening, you will see the word &#8220;Upload&#8221; replaced by the word &#8220;Processing&#8221;. Once finished, the App will fill the calibration section of the App with your containers and pipettes.</p>
-</div>
-<div class="section" id="jogging">
-<h2>Jogging<a class="headerlink" href="#jogging" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="xyz">
-<h3>XYZ<a class="headerlink" href="#xyz" title="Permalink to this headline">¶</a></h3>
-<p>Move in the X, Y and Z by selecting your desired increment, and then clicking an arrow button.</p>
-<img alt="_images/pipette-jog.png" src="_images/pipette-jog.png" />
-</div>
-<div class="section" id="slot-button">
-<h3>Slot Button<a class="headerlink" href="#slot-button" title="Permalink to this headline">¶</a></h3>
-<p>The slot button moves exactly one slot over in either X or Y, depending on which arrow you choose.  This is particularly useful when calibrating multiple containers of the same type (eg an entire deck of 96 well plates).  There is no slot Z, the robot will just move 1 mm.</p>
-</div>
-<div class="section" id="ab-plungers">
-<h3>AB Plungers<a class="headerlink" href="#ab-plungers" title="Permalink to this headline">¶</a></h3>
-<p>Use the plunger jog to move the plunger up and down.  If you have selected a container or the pipette for the B axis, then the B axis will move, and if you have selected a container or the pipette for the A axis, it will move.</p>
-<p>The app automatically toggles between pipettes (unlike 1.2)</p>
-</div>
-<div class="section" id="move-to-slot">
-<h3>Move to Slot<a class="headerlink" href="#move-to-slot" title="Permalink to this headline">¶</a></h3>
-<p>Jump to any slot on the deck with the Move to Slot buttons.  The deck will automatically react and change between a 3x5 layout and a 2x5 layout based on which robot you are connected to (Hood vs. Pro/Standard)</p>
-<img alt="_images/move-to-slot.png" src="_images/move-to-slot.png" />
-</div>
-</div>
-<div class="section" id="calibrate">
-<h2>Calibrate<a class="headerlink" href="#calibrate" title="Permalink to this headline">¶</a></h2>
-<p>Once each container or pipette is calibrated, a check mark will appear next to it in the container list.</p>
-<img alt="_images/container-list.png" src="_images/container-list.png" />
-<div class="section" id="tipracks">
-<h3>Tipracks<a class="headerlink" href="#tipracks" title="Permalink to this headline">¶</a></h3>
-<p>Jog the pipette down into the first tip in the tip rack.  It should be firmly pushed into the tip, and the pick up tip button can be used to test its seating.</p>
-<p>Calling the pick up tip button from anywhere on the deck will direct the robot back to the tiprack to pick up a tip.  Drop tip will send the tip to the trash.</p>
-<img alt="_images/container-calibration.png" src="_images/container-calibration.png" />
-</div>
-<div class="section" id="containers">
-<h3>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h3>
-<p>With a tip on the pipette, calibrate to the bottom of the first well or tube in the container. Use the diagrams in the app to guide calibration.</p>
-</div>
-<div class="section" id="pipettes">
-<h3>Pipettes<a class="headerlink" href="#pipettes" title="Permalink to this headline">¶</a></h3>
-<p>Four calibrations positions need to be set for each pipette: Top, Bottom, Blow Out and Drop Tip.  Make sure your pipette is manually set to its highest volume (or ~5 uL higher) for accurate calibration.</p>
-<img alt="_images/pipette-calibration.png" src="_images/pipette-calibration.png" />
-<p>Once these positions are all saved, you can test your calibrations. This is most easily done gravimetrically using a small scale. Use the aspirate and dispense buttons to pick up liquid and eject it onto the scale. If this volume isn&#8217;t exactly what you expect, maybe 203 uL instead of 200, no big deal! You can go input the value into the max volume box. The robot will adjust its calculations accordingly and will then be able to dispense the correct volumes during experiments.</p>
-<p>The drop tip screw may need to be adjusted up or down if you cannot accurately calibrate Bottom.</p>
-</div>
-</div>
-<div class="section" id="run-protocol">
-<h2>Run Protocol<a class="headerlink" href="#run-protocol" title="Permalink to this headline">¶</a></h2>
-<p>Once all your positions are saved, you can run your protocol.  A progress will keep track of what percentage of your protocol has been done.  Protocols can be paused, or they can be stopped entirely.  We recommend homing after all protocols have been completed or stopped.</p>
-<img alt="_images/running-protocol.png" src="_images/running-protocol.png" />
 </div>
 </div>
 
@@ -250,44 +223,31 @@ In a terminal window, run the following command</p>
 <li class="toctree-l1"><a class="reference internal" href="transfer.html">Transfer Shortcuts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html">Protocol Cookbook</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Protocol Cookbook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plate-well-filling-with-8-channel-pipette">384 Plate Well Filling with 8-channel pipette</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dispensing-at-the-bottom-while-filling-a-384-plate">Dispensing at the bottom while filling a 384 plate</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">How to Calibrate</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#download-app">Download App</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#connect-to-robot">Connect to Robot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#upload-protocol">Upload Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#jogging">Jogging</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#xyz">XYZ</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#slot-button">Slot Button</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ab-plungers">AB Plungers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#move-to-slot">Move to Slot</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#calibrate">Calibrate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#tipracks">Tipracks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#containers">Containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pipettes">Pipettes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#run-protocol">Run Protocol</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="calibration.html">How to Calibrate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="firmware.html">Firmware Updates</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="api.html" title="previous chapter">API Reference</a></li>
-      <li>Next: <a href="firmware.html" title="next chapter">Firmware Updates</a></li>
+      <li>Previous: <a href="modules.html" title="previous chapter">Hardware Modules</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/calibration.txt"
+      <li><a href="_sources/cookbook.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
