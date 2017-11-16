@@ -15,7 +15,7 @@ class IngredGroupCard extends React.Component {
 
   render () {
     const {ingredCategoryData, editModeIngredientGroup, deleteIngredient, selected, ...otherProps} = this.props
-    const { groupId, serializeName } = ingredCategoryData
+    const { groupId, serializeName, wells, serializeNumbers, individualize } = ingredCategoryData
     const { isExpanded } = this.state
 
     return (
@@ -28,10 +28,14 @@ class IngredGroupCard extends React.Component {
           <div className={styles.editButton} onClick={e => editModeIngredientGroup({groupId})}>EDIT</div>
         </label>
 
-        {isExpanded && ingredCategoryData.wells.map((wellName, i) =>
+        {isExpanded && wells.map((wellName, i) =>
           <IngredIndividual key={i}
-            name={ingredCategoryData.individualize
-              ? get(ingredCategoryData, ['wellDetails', wellName, 'name'], `${serializeName || 'Sample'} ${i + 1}`)
+            name={individualize
+              ? get(
+                  ingredCategoryData,
+                  ['wellDetails', wellName, 'name'],
+                  `${serializeName || 'Sample'} ${serializeNumbers[i]}`
+                )
               : ' '
             }
             wellName={wellName}
@@ -72,7 +76,6 @@ const IngredientsList = ({slotName, containerName, containerType, ingredients, e
       </div>
       <div className={styles.containerName}>{containerName}</div>
     </div>
-
     {ingredients.map((ingredCategoryData, i) =>
       <IngredGroupCard key={i} {...{
         editModeIngredientGroup,

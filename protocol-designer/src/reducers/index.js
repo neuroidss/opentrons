@@ -10,6 +10,8 @@ import pickBy from 'lodash/pickBy'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import set from 'lodash/set' // <- careful, this mutates the object
+import sum from 'lodash/sum'
+import uniq from 'lodash/uniq'
 
 import { containerDims, toWellName, getMaxVolumes, wellKeyToXYList } from '../constants.js'
 import { uuid } from '../utils.js'
@@ -127,7 +129,7 @@ const highlightedIngredients = handleActions({
 export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action) => {
     const editableIngredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize']
-    const { groupId, containerId } = action.payload
+    const { groupId, containerId, copyGroupId } = action.payload
     if (!isNil(groupId)) {
       // GroupId was given, edit existing ingredient
       return set(
@@ -141,16 +143,40 @@ export const ingredients = handleActions({
       )
     }
     // No groupId, create new ingredient groupId by adding 1 to the highest ID
-    // TODO: use uuid
+    // TODO: use uuid, use an array of uuids to give order to ingreds.
     const newGroupId = Object.keys(state).length === 0
       ? 0
       : Math.max(...Object.keys(state).map(key => parseInt(key))) + 1
 
+    const isUnchangedClone = state[copyGroupId] && editableIngredFields.every(field =>
+        state[copyGroupId][field] === action.payload[field])
+
+    if (isUnchangedClone) {
+      // for an unchanged clone, just add the new wells.
+      // TODO: make this more concise
+      return {
+        ...state,
+        [copyGroupId]: {
+          ...state[copyGroupId],
+          locations: {
+            ...state[copyGroupId].locations,
+            [containerId]: state[copyGroupId].locations[containerId]
+              ? uniq(state[copyGroupId].locations[containerId].concat(action.payload.wells))
+              : action.payload.wells
+          }
+        }
+      }
+    }
+
+    // otherwise, create a new ingredient group
     return {
       ...state,
       [newGroupId]: {
         ...pick(action.payload, editableIngredFields),
-        locations: { [containerId]: action.payload.wells }
+        locations: { [containerId]: action.payload.wells },
+        name: state[copyGroupId] && state[copyGroupId].name === action.payload.name
+          ? state[copyGroupId].name + ' copy' // todo: copy 2, copy 3 etc.
+          : action.payload.name
       }
     }
   },
@@ -187,7 +213,7 @@ export const ingredients = handleActions({
   }
 }, {})
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   modeLabwareSelection,
   copyLabwareMode,
   selectedContainer,
@@ -200,7 +226,7 @@ const rootReducer = combineReducers({
 
 // SELECTORS
 
-const rootSelector = state => state.default
+const rootSelector = state => state
 
 const _loadedContainersBySlot = containers =>
   reduce(containers, (acc, container, containerId) => (container.slotName)
@@ -278,25 +304,36 @@ const allIngredients = createSelector(
 )
 
 // returns selected group id (index in array of all ingredients), or undefined.
-// groupId is a string eg '42'
+// groupId is a string, eg '42'
 const selectedIngredientGroupId = createSelector(
   rootSelector,
   state => get(state, ['selectedIngredientGroup', 'groupId'])
 )
 
-const _selectedIngredientGroupObj = createSelector(
-  selectedIngredientGroupId,
-  allIngredients,
-  (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
-    ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
-    : null
-)
+// const _selectedIngredientGroupObj = createSelector(
+//   selectedIngredientGroupId,
+//   allIngredients,
+//   (ingredGroupId, allIngredients) => allIngredients[ingredGroupId]
+//     ? ({...allIngredients[ingredGroupId], groupId: ingredGroupId})
+//     : null
+// )
+//
+// // TODO remove
+// const selectedIngredientProperties = createSelector(
+//   _selectedIngredientGroupObj,
+//   ingredGroup => (!isNil(ingredGroup))
+//     ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
+//     : null
+// )
 
-const selectedIngredientProperties = createSelector(
-  _selectedIngredientGroupObj,
-  ingredGroup => (!isNil(ingredGroup))
-    ? pick(ingredGroup, ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId'])
-    : null
+const ingredFields = ['name', 'serializeName', 'volume', 'concentration', 'description', 'individualize', 'groupId']
+
+const allIngredientGroupFields = createSelector(
+  allIngredients,
+  allIngredients => reduce(allIngredients, (acc, ingredGroup, ingredGroupId) => ({
+    ...acc,
+    [ingredGroupId]: pick(ingredGroup, ingredFields)
+  }), {})
 )
 
 const selectedWellNames = createSelector(
@@ -331,16 +368,28 @@ const selectedWellsMaxVolume = createSelector(
 const _ingredientsForContainerId = (allIngredients, containerId) => {
   const ingredGroupFromIdx = (allIngredients, idx) => allIngredients[idx]
 
-  const ingredGroupConvert = (ingredGroup, groupId) => ({
-    ...ingredGroup,
-    groupId,
-    // Convert deck-wide data to container-specific
-    wells: ingredGroup.locations[containerId],
-    wellDetails: get(ingredGroup, ['wellDetailsByLocation', containerId]),
-    // Hide the deck-wide data
-    locations: undefined,
-    wellDetailsByLocation: undefined
-  })
+  const ingredGroupConvert = (ingredGroup, groupId) => {
+    const containersWithThisIngredGroup = Object.keys(ingredGroup.locations).concat().sort()
+    const numWellsPerContainer = containersWithThisIngredGroup.map(contId => ingredGroup.locations[contId].length)
+    const serializeOffset = sum(
+      numWellsPerContainer.slice(
+        0,
+        containersWithThisIngredGroup.findIndex(contId => contId === containerId)
+      )
+    )
+
+    return {
+      ...ingredGroup,
+      groupId,
+      // Convert deck-wide data to container-specific
+      wells: ingredGroup.locations[containerId],
+      serializeNumbers: ingredGroup.locations[containerId].map((_, i) => i + 1 + serializeOffset),
+      wellDetails: get(ingredGroup, ['wellDetailsByLocation', containerId]),
+      // Hide the deck-wide data
+      locations: undefined,
+      wellDetailsByLocation: undefined
+    }
+  }
 
   return Object.keys(allIngredients).map(idx => {
     const ingredGroup = ingredGroupFromIdx(allIngredients, idx)
@@ -349,6 +398,7 @@ const _ingredientsForContainerId = (allIngredients, containerId) => {
     : false
   }).filter(ingred => ingred !== false)
 }
+
 const ingredientsForContainer = createSelector(
   allIngredients,
   selectedContainerSelector,
@@ -357,6 +407,13 @@ const ingredientsForContainer = createSelector(
     ? _ingredientsForContainerId(allIngredients, selectedContainer.containerId)
     : null
   }
+)
+
+// [{ingredientId, name}]
+const allIngredientNamesIds = createSelector(
+  allIngredients,
+  allIngreds => Object.keys(allIngreds).map(ingredId =>
+      ({ingredientId: ingredId, name: allIngreds[ingredId].name}))
 )
 
 const _getWellMatrix = (containerType, ingredientsForContainer, selectedWells, highlightedWells) => {
@@ -437,6 +494,8 @@ const labwareToCopy = state => rootSelector(state).copyLabwareMode
 // TODO: prune selectors
 export const selectors = {
   activeModals,
+  allIngredientGroupFields,
+  allIngredientNamesIds,
   allWellMatricesById,
   loadedContainersBySlot,
   containersBySlot,
@@ -450,7 +509,7 @@ export const selectors = {
   selectedContainer: selectedContainerSelector,
   containerById,
   ingredientsForContainer,
-  selectedIngredientProperties,
+  // selectedIngredientProperties,
   selectedIngredientGroupId
 }
 
