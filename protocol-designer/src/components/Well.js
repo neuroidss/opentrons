@@ -7,13 +7,26 @@ import WellToolTip from '../components/WellToolTip.js'
 
 import styles from '../css/style.css' // TODO use own styles
 
-const Well = ({x, y, wellContent, selectable, ...otherProps}) => {
+Well.propTypes = {
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+  wellContent: PropTypes.shape({
+    number: PropTypes.number,
+    selected: PropTypes.bool,
+    preselected: PropTypes.bool,
+    highlighted: PropTypes.bool,
+    hovered: PropTypes.bool,
+    groupId: PropTypes.string
+  }).isRequired
+}
+
+export default function Well ({x, y, wellContent, selectable, ...otherProps}) {
   const { preselected, selected, highlighted, hovered, groupId } = wellContent
   const isFilled = (groupId !== null && groupId !== undefined)
   return (
     <div
       className={cx(
-        styles.wellRound,
+        styles.well_round,
         {[styles.selected]:
           selected,
           [styles.preselected]: preselected,
@@ -34,21 +47,6 @@ const Well = ({x, y, wellContent, selectable, ...otherProps}) => {
       >
       {/* TODO: hovered prop */}
       {hovered && isFilled && <WellToolTip wellContent={wellContent} />}
-      <div className={styles.innerWell} /></div>
+      <div className={styles.inner_well} /></div>
   )
 }
-
-Well.propTypes = {
-  x: PropTypes.number.isRequired,
-  y: PropTypes.number.isRequired,
-  wellContent: PropTypes.shape({
-    number: PropTypes.number,
-    selected: PropTypes.bool,
-    preselected: PropTypes.bool,
-    highlighted: PropTypes.bool,
-    hovered: PropTypes.bool,
-    groupId: PropTypes.string
-  }).isRequired
-}
-
-export default Well

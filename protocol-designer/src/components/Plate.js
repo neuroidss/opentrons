@@ -15,6 +15,15 @@ const transpose = matrix => matrix[0].map((_col, i) =>
 )
 
 class Plate extends React.Component {
+  static propTypes = {
+    wellMatrix: PropTypes.array.isRequired,
+    showLabels: PropTypes.bool,
+    cssFillParent: PropTypes.bool, // if true, plate stretches to fill parent element, instead of having its own aspect ratio
+    transpose: PropTypes.bool,
+
+    Well: PropTypes.func.isRequired // this fn should return a Well React element
+  }
+
   makeColumns () {
     const { wellMatrix, Well, selectable, showLabels } = this.props
 
@@ -44,8 +53,8 @@ class Plate extends React.Component {
     const { showLabels, className, transpose, wellMatrix, Well, cssFillParent, ...otherProps } = this.props
 
     return (
-      <section className={cssFillParent ? styles.fillParent : styles.aspect_ratio}>
-        <div className={styles.layoutWrapper}>
+      <section className={cssFillParent ? styles.fill_parent : styles.aspect_ratio}>
+        <div className={styles.layout_wrapper}>
           <div {...otherProps}
             className={classnames(styles[className], styles.plate)}
           >
@@ -59,15 +68,6 @@ class Plate extends React.Component {
       </section>
     )
   }
-}
-
-Plate.propTypes = {
-  wellMatrix: PropTypes.array.isRequired,
-  showLabels: PropTypes.bool,
-  cssFillParent: PropTypes.bool, // if true, plate stretches to fill parent element, instead of having its own aspect ratio
-  transpose: PropTypes.bool,
-
-  Well: PropTypes.func.isRequired // this fn should return a Well React element
 }
 
 export default Plate

@@ -22,6 +22,21 @@ const makeInputField = ({setSubstate, getSubstate}) => ({accessor, numeric, ...o
 }
 
 class IngredientPropertiesForm extends React.Component {
+  static propTypes = {
+    onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    numWellsSelected: PropTypes.number.isRequired,
+    selectedWellsMaxVolume: PropTypes.number.isRequired,
+
+    selectedIngredientProperties: PropTypes.shape({
+      name: PropTypes.string,
+      volume: PropTypes.number,
+      description: PropTypes.string,
+      groupId: PropTypes.string
+    })
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -118,15 +133,15 @@ class IngredientPropertiesForm extends React.Component {
     }
 
     return (
-      <div className={styles.ingredientPropertiesEntry}>
+      <div className={styles.ingredient_properties_entry}>
         <h1>
           <div>Ingredient Properties</div>
           <div>{numWellsSelected} Well(s) Selected</div>
         </h1>
 
         <form>
-          <div className={styles.middleRow}>
-            <span className={styles.twoThirds}>
+          <div className={styles.middle_row}>
+            <span className={styles.two_thirds}>
               <label>Name</label>
               <Field accessor='name' />
             </span>
@@ -140,7 +155,7 @@ class IngredientPropertiesForm extends React.Component {
               </select>
             </span>}
           </div>
-          <div className={styles.middleRow}>
+          <div className={styles.middle_row}>
             <span>
               <span className={styles.checkbox}>
                 <Field accessor='individualize' type='checkbox' />
@@ -148,9 +163,9 @@ class IngredientPropertiesForm extends React.Component {
               </span>
               {individualize && <Field accessor='serializeName' placeholder='Sample' />}
             </span>
-            <span className={styles.serializeNameExample}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
+            <span className={styles.serialize_name_example}>(ie Sample 1, Sample 2, Sample 3, ...)</span>
           </div>
-          <div className={styles.middleRow}>
+          <div className={styles.middle_row}>
             <span style={{borderColor: maxVolExceeded && 'red'}}>
               <label>Volume (µL)</label>
               {maxVolExceeded && // TODO: clean up the styling for this
@@ -164,7 +179,7 @@ class IngredientPropertiesForm extends React.Component {
               <Field accessor='concentration' />
             </span>
           </div>
-          <div className={styles.flexRow}>
+          <div className={styles.flex_row}>
             <span>
               <label>Description</label>
               <Field accessor='description' type='textarea' />
@@ -179,7 +194,7 @@ class IngredientPropertiesForm extends React.Component {
           <label>Color Swatch</label>
           <div className={styles.circle} style={{backgroundColor: 'red'}} />
         </span> */}
-        <div className={styles.buttonRow}>
+        <div className={styles.button_row}>
           <Button /* disabled={TODO: validate input here} */
             onClick={e => onSave({...this.state.input, copyGroupId: this.state.copyGroupId})}
           >
@@ -187,7 +202,7 @@ class IngredientPropertiesForm extends React.Component {
           </Button>
           <Button onClick={onCancel}>Cancel</Button>
           {editMode &&
-            <Button className={styles.deleteIngred} onClick={() =>
+            <Button className={styles.delete_ingred} onClick={() =>
               window.confirm('Are you sure you want to delete all ingredients in this group?') &&
               onDelete(selectedIngredientFields.groupId)
             }>Delete Ingredient</Button>
@@ -196,25 +211,6 @@ class IngredientPropertiesForm extends React.Component {
       </div>
     )
   }
-}
-
-IngredientPropertiesForm.propTypes = {
-  onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  numWellsSelected: PropTypes.number.isRequired,
-  selectedWellsMaxVolume: PropTypes.number.isRequired,
-
-  editingIngredGroupId: PropTypes.number,
-  allIngredientGroupFields: PropTypes.object
-  // allIngredientGroupFields: PropTypes.shape({
-  //  // TODO: since the keys are arbitrary, this would need a custom type checker
-  //  // https://stackoverflow.com/questions/34362898/proptypes-check-of-object-with-dynamic-keys
-  //   name: PropTypes.string,
-  //   volume: PropTypes.number,
-  //   description: PropTypes.string,
-  //   groupId: PropTypes.string
-  // })
 }
 
 export default IngredientPropertiesForm

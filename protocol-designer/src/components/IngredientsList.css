@@ -1,3 +1,4 @@
+/* TODO(ian, 2017-11-17): don't use global input, label, etc */
 input {
   width: 100%;
 }
@@ -7,80 +8,82 @@ label {
   text-transform: none;
 }
 
-.ingredientsList {
+.ingredients_list {
   height: 100%;
   background-color: white;
   overflow-y: scroll;
 }
 
-.ingredientsList section > label {
+.ingredients_list section > label {
   border-bottom: 1px solid gray;
   display: block;
 }
 
-.arrowDropdown {
+.arrow_dropdown {
   color: black;
   margin-right: 0.5rem;
 }
 
-.ingredListHeaderLabel {
+.ingred_list_header_label {
   color: white;
   background-color: black;
   padding: 1em;
   border-radius: 0;
 }
 
-.flexRow {
+.flex_row {
   display: flex;
   align-items: baseline;
 }
-.ingredListHeaderLabel div {
+
+.ingred_list_header_label div {
   text-align: left;
   font-size: 1em;
   font-weight: bold;
 }
 
-.ingredListHeaderLabel .containerName {
+.ingred_list_header_label .container_name {
   font-size: 1.5em;
 }
 
-.ingredListHeaderLabel .containerType {
+.ingred_list_header_label .container_type {
   padding: 0 1em;
   font-weight: normal;
 }
 
-.ingredientsList section {
+.ingredients_list section {
   margin: 12pt;
-  /*box-shadow: 0px 0px 10px 3px darkgrey;*/
+
+  /* box-shadow: 0px 0px 10px 3px darkgrey; */
   border-radius: 0;
   padding: 0.2em 1em;
 }
 
-.ingredientsList section.selected {
+.ingredients_list section.selected {
   border: 1rem solid skyblue;
 }
 
-.ingredientsList section > label {
+.ingredients_list section > label {
   display: flex;
   justify-content: flex-end;
 }
 
-.ingredientsList section > label .ingredLabel {
+.ingredients_list section > label .ingred_label {
   flex: 1;
 }
 
-.ingredientsList section footer {
+.ingredients_list section footer {
   display: flex;
   justify-content: space-between;
 }
 
-.ingredientsList section footer .editButton {
+.ingredients_list section footer .edit_button {
   /* NOTE: this footer was removed 2017-10-23 */
   border: 2px lightgray solid;
   padding: 2px;
 }
 
-.editButton {
+.edit_button {
   color: white;
   background-color: black;
   font-weight: bold;
@@ -92,32 +95,34 @@ label {
   padding: 0.1em 0.2em;
 }
 
-.deleteIngredient {
+.delete_ingredient {
   cursor: pointer;
   float: right;
   font-size: 12pt;
   color: gray;
 }
 
-.deleteIngredient:hover, .editButton:hover, section.selected .editButton {
+.delete_ingredient:hover,
+.edit_button:hover,
+section.selected .edit_button {
   color: white;
-  background-color: lightgray
+  background-color: lightgray;
 }
 
 /* --------- */
 
-.ingredLabel {
+.ingred_label {
   font-weight: bold;
   margin-left: 0.2rem;
 }
 
-.addIngredientButton {
+.add_ingredient_button {
   margin-left: 30%; /* HACK doesn't work with diff widths */
 }
 
 /* -------- */
 
-.ingredientInlineDetail {
+.ingredient_inline_detail {
   margin: 0.4em 0;
   color: darkgray;
   width: 100%;
@@ -125,13 +130,13 @@ label {
   flex-wrap: wrap;
 }
 
-.ingredientInlineDetail div {
+.ingredient_inline_detail div {
   display: flex;
   width: 5rem;
   margin: 0.25rem;
 }
 
-.ingredientInlineDetail label {
+.ingredient_inline_detail label {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   background-color: lightgray;
@@ -140,25 +145,26 @@ label {
   text-align: center;
 }
 
-.ingredientInlineDetail input {
+.ingredient_inline_detail input {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   flex: 3;
   text-align: center;
 }
 
-/*.ingredientInlineDetail input::after {
+/* .ingredient_inline_detail input::after {
   content: 'µL';
   position: absolute;
   padding-right: 0.2em;
-}*/
+} */
 
 /* TODO: reuse this */
 
 .circle {
   border-radius: 1000px;
   background-color: gray; /* <-- set inline */
-  /*background-color: --color-swatch;*/
+
+  /* background-color: --color-swatch; */
   height: 0.8rem;
   width: 0.8rem;
   margin-right: 0.1rem;
@@ -166,7 +172,7 @@ label {
 
 /* ------- */
 
-/*.leftPill {
+/* .leftPill {
   padding: 2px 0 2px 0.5rem;
   background-color: lightgray;
   border-top-right-radius: 0;
@@ -187,55 +193,55 @@ label {
 .innerList {
   overflow-y: scroll;
   height: 15vh;
-}*/
+} */
 
 /* ------- */
 
-.ingredientInstanceItem {
+.ingredient_instance_item {
   display: flex;
-  /*width: 100%;
+
+  /* width: 100%;
   padding-top: 2px;
-  padding-bottom: 2px;*/
+  padding-bottom: 2px; */
   flex-direction: row;
   justify-content: space-between;
   border-radius: 0;
   padding: 0.25rem;
 }
 
-.ingredientInstanceItem div {
+.ingredient_instance_item div {
   flex: 1;
 }
 
-.ingredientInstanceItem:nth-child(odd) {
+.ingredient_instance_item:nth-child(odd) {
   background-color: #eee;
 }
 
-.ingredientInstanceItem div:first-child {
-  /* Well name */
+.ingredient_instance_item div:first-child {
+  /*    Well name */
   margin-left: 0.25rem;
   color: gray;
   flex: 0.5;
 }
 
-.ingredientInstanceItem div:last-child {
+.ingredient_instance_item div:last-child {
   /* X to delete */
   flex: 0.25;
 }
 
-.ingredientInstanceItem input {
+.ingredient_instance_item input {
   text-align: center;
   font-size: inherit;
 }
 
 /* ------- */
 
-.singleIngred {
+.single_ingred {
   margin: 0 1rem;
   border: 2px solid gray;
-
 }
 
-.singleIngred label::before {
+.single_ingred label::before {
   content: ' ';
   display: inline-block;
   border-radius: 1000px;
@@ -244,23 +250,23 @@ label {
   height: 0.8rem;
   width: 0.8rem;
   margin-left: 1rem;
-  margin-right:0.25rem;
+  margin-right: 0.25rem;
 }
 
-.singleIngred * {
+.single_ingred * {
   padding: 0;
 }
 
-.singleIngred label {
+.single_ingred label {
   font-weight: bold;
 }
 
-.singleIngred input {
+.single_ingred input {
   border-top: none;
   border-bottom: none;
 }
 
-.singleIngred .deleteIngredient {
+.single_ingred .delete_ingredient {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: 1px solid gray;
