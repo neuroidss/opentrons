@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ListItem from './ListItem'
+import {ListItem} from '@opentrons/components'
 
 // TODO: condense booleans to some more logical isDisabled selector
 LabwareListItem.propTypes = {

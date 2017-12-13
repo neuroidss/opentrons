@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import capitalize from 'lodash/capitalize'
 
-import ListItem from './ListItem'
+import {ListItem} from '@opentrons/components'
 
 InstrumentListItem.propTypes = {
   isRunning: PropTypes.bool.isRequired,
@@ -30,7 +30,7 @@ export default function InstrumentListItem (props) {
   const units = !isDisabled ? 'ul' : null
   return (
     <ListItem
-      isDisabled={isDisabled || isRunning}
+      disabled={isDisabled || isRunning}
       url={url}
       onClick={!isRunning && clearLabwareReviewed}
       confirmed={confirmed}
