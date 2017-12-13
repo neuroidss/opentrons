@@ -1,0 +1,18 @@
+/* Font Colors */
+@value lightText: #FFFFFF;
+@value defaultText: #808080;
+@value darkText: #4A4A4A;
+
+/* Grays */
+@value darkGrey: #4a4a4a;
+@value medGrey: #d8d8d8;
+@value lightGrey: #eee;
+
+/* Colors */
+@value blue: #006FFF;
+@value teal: #05C1B3;
+@value mustard: #FFD252;
+
+/* Misc */
+@value overlayColor: rgba(0, 0, 0, 0.7);
+@value plateBg: medGrey;

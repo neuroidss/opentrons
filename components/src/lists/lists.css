@@ -1,0 +1,88 @@
+@value lightGrey, medGrey, darkGrey, defaultText from '../colors.css';
+
+.titled_list {
+  list-style-type: none;
+  margin: 0.5em;
+  box-sizing: border-box;
+}
+
+.list_title {
+  color: defaultText;
+  text-decoration: none;
+  font-size: 1rem;
+  background-color: lightGrey;
+  display: block;
+  height: 3rem;
+  line-height: 3;
+  padding-left: 0.5rem;
+  text-transform: uppercase;
+}
+
+li.list_item {
+  margin: 0;
+}
+
+.list_item a {
+  background-color: lightGrey;
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 0.75rem;
+  border-bottom: 2px solid grey;
+  color: gray;
+  padding: 0 0.5rem;
+}
+
+.list_item a:hover,
+.active {
+  background-color: #eee;
+}
+
+.list-item a[disabled] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.icon {
+  width: 2rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* TODO: revisit this once we have icons as svg */
+.icon::before {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  content: '';
+  line-height: 1rem;
+  text-align: center;
+  color: darkGrey;
+  border: 2px solid darkGrey;
+  border-radius: 50%;
+}
+
+.icon.confirmed::before {
+  background-color: darkGrey;
+  content: '✓';
+  color: white;
+}
+
+.info {
+  width: calc(100% - 2rem);
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: top;
+}
+
+.titled_list li.alert {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-style: italic;
+}
