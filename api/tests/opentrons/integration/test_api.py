@@ -26,7 +26,7 @@ def test_smoke(virtual_smoothie_env, smoke):
 
 
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
-async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
+async def test_multi_single(main_router, protocol, protocol_file):
     robot.connect()
     robot.home()
 
@@ -50,7 +50,7 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
 
 
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
-async def test_load_jog_save_run(main_router, protocol, protocol_file, dummy_db):  # NOQA
+async def test_load_jog_save_run(main_router, protocol, protocol_file):
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))

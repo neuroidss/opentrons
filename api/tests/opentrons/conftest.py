@@ -5,14 +5,13 @@
 import asyncio
 import os
 import re
-import shutil
+import tempfile
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
 
 import pytest
 from opentrons.api import models
-from opentrons.data_storage import database
 from opentrons.server import rpc
 
 # Uncomment to enable logging during tests
@@ -52,13 +51,6 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename'])
 
-# Note: When dummy_db or robot fixtures are used, this db is copied into a
-# a temp testing_db that is deleted in between tests to allow for db mutation
-MAIN_TESTER_DB = str(os.path.join(
-    os.path.dirname(
-        globals()["__file__"]), 'testing_database.db')
-)
-
 
 def state(topic, state):
     def _match(item):
@@ -82,26 +74,8 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-def print_db_path(db):
-    cursor = database.db_conn.cursor()
-    cursor.execute("PRAGMA database_list")
-    db_info = cursor.fetchone()
-    print("Database: ", db_info[2])
-
-
-# Builds a temp db to allow mutations during testing
 @pytest.fixture
-def dummy_db(tmpdir):
-    temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
-    shutil.copy2(MAIN_TESTER_DB, temp_db_path)
-    database.change_database(temp_db_path)
-    yield None
-    database.change_database(MAIN_TESTER_DB)
-    os.remove(temp_db_path)
-
-
-@pytest.fixture
-def robot(dummy_db):
+def robot():
     from opentrons import Robot
     return Robot()
 
@@ -110,7 +84,7 @@ def robot(dummy_db):
 def protocol(request):
     try:
         root = request.getfuncargvalue('protocol_file')
-    except Exception as e:
+    except Exception:
         root = request.param
 
     filename = os.path.join(os.path.dirname(__file__), 'data', root)
@@ -139,7 +113,7 @@ def session(loop, test_client, request, main_router):
             root = main_router
         # Assume test fixture has init to attach test loop
         root.init(loop)
-    except Exception as e:
+    except Exception:
         pass
 
     server = rpc.Server(loop=loop, root=root)
@@ -182,15 +156,21 @@ def connect(session, test_client):
     return _connect
 
 
-def setup_testing_env():
-    database.change_database(MAIN_TESTER_DB)
-
-
 @pytest.fixture
 def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     yield
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
+@pytest.fixture
+def user_definition_dirs(monkeypatch):
+    tmp_usr_root = tempfile.mkdtemp()
+    os.mkdir(os.path.join(tmp_usr_root, 'definitions'))
+    os.mkdir(os.path.join(tmp_usr_root, 'offsets'))
+    monkeypatch.setenv("USER_DEFN_ROOT", tmp_usr_root)
+    yield
+    monkeypatch.setenv("USER_DEFN_ROOT", '')
 
 
 @pytest.fixture
@@ -257,6 +237,3 @@ def smoothie(monkeypatch):
     yield driver
     driver.disconnect()
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
-
-
-setup_testing_env()

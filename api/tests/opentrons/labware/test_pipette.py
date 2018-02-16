@@ -5,7 +5,6 @@ from unittest import mock
 from opentrons.robot.robot import Robot
 from opentrons.containers import load as containers_load
 from opentrons.instruments import Pipette
-# from opentrons.util.vector import Vector
 from opentrons.containers.placeable import unpack_location, Container, Well
 from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert

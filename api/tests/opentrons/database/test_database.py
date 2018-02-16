@@ -57,7 +57,7 @@ from opentrons.util.vector import Vector
 def test_container_from_container_load(robot):
     plate = containers_load(robot, '96-flat', '1')
     assert plate.get_type() == '96-flat'
-    assert plate._coordinates == Vector(14.34, 11.24, 10.50)
+    assert plate[0]._coordinates == Vector(11.14, 71.04, 0)
 
 
 def test_well_from_container_load(robot):
@@ -71,76 +71,6 @@ def test_well_from_container_load(robot):
                                    'length': 6.4}
 
 
-def test_container_parse(robot):
-    plate = containers_load(robot, '96-flat', '1')
-    assert database._parse_container_obj(plate) == {
-        'x': 14.34,
-        'y': 11.24,
-        'z': 10.50
-    }
-
-
-# def test_well_parse(robot):
-#     plate = containers_load(robot, '96-flat', 'A1')
-#     assert database._parse_well_obj(plate[18]) == {
-#         'diameter': 6.4,
-#         'y': 18.0,
-#         'width': 6.4,
-#         'x': 18.0,
-#         'depth': 10.5,
-#         'length': 6.4,
-#         'z': 0.0,
-#         'volume': 400,
-#         'location': 'C3'
-#     }
-
-#     assert database._parse_well_obj(plate[45]) == {
-#         'diameter': 6.4,
-#         'y': 45.0,
-#         'width': 6.4,
-#         'x': 45.0,
-#         'depth': 10.5,
-#         'length': 6.4,
-#         'z': 0.0,
-#         'volume': 400,
-#         'location': 'F6'
-#     }
-
-
-# def test_load_all_containers():
-#     containers = [database.load_container(container_name)
-#                   for container_name in database.list_all_containers()]
-#     containers_and_coords = \
-#         {container.get_type(): container._coordinates
-#          for container in containers}
-
-#     for container, offset in containers_and_coords.items():
-#         expected_offset = Vector(EXPECTED_CONTAINER_OFFSETS[container])
-#         assert offset[0] == expected_offset[0]
-#         assert offset[1] == expected_offset[1]
-#         assert offset[2] == expected_offset[2]
-
-
-# # TODO (ben 20171030): fix and move to a relevant test
-# # suite--doesn't belong here
-# # def test_calibrate_container(robot):
-# #     plate1 = containers_load(robot, '96-flat', 'A1')
-# #     plate2 = containers_load(robot, '96-flat', 'B1')
-# #     pt = robot.poses
-# #     assert absolute(pt, plate1) == Vector(21.24, 24.34, 0.00)
-# #     assert absolute(pt, plate2) == Vector(112.24, 24.34, 0.00)
-# #     assert plate1._coordinates == Vector(11.24, 14.34, 0.00)
-# #     assert plate2._coordinates == Vector(11.24, 14.34, 0.00)
-# #
-# #     p200 = Pipette(robot, mount='right')
-# #     robot.move_head(x=100, y=150, z=5)
-# #     robot.calibrate_container_with_instrument(plate1, p200, save=True)
-# #     assert plate1._coordinates == Vector(90.00, 140.00, 5.00)
-# #     assert plate2._coordinates == Vector(11.24, 14.34, 0.00)
-# #     plate2 = containers_load(robot, '96-flat', 'C1')
-# #     assert plate2._coordinates == Vector(90.00, 140.00, 5.00)
-
-
 def test_load_persisted_container():
     plate = database.load_container("24-vial-rack")
     assert isinstance(plate, Container)
@@ -149,10 +79,6 @@ def test_load_persisted_container():
 
     assert plate[0].coordinates() == (8.19, 63.76, 0)
     assert plate[1].coordinates() == (27.49, 63.76, 0)
-
-
-# def test_load_all_persisted_containers():
-#     assert len(database.list_all_containers()) == 43
 
 
 def test_invalid_container_name():

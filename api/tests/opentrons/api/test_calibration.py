@@ -127,7 +127,7 @@ async def test_jog(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_update_container_offset(main_router, model):
+async def test_update_container_offset(user_definition_dirs, main_router, model):
     with mock.patch.object(
             model.robot,
             'calibrate_container_with_instrument') as call:
@@ -142,7 +142,7 @@ async def test_update_container_offset(main_router, model):
         )
 
 
-async def test_jog_calibrate(dummy_db, main_router, model):
+async def test_jog_calibrate(user_definition_dirs, main_router, model):
     from numpy import array, isclose
     from opentrons.trackers import pose_tracker
 
@@ -160,6 +160,7 @@ async def test_jog_calibrate(dummy_db, main_router, model):
     main_router.calibration_manager.jog(model.instrument, 2, 'y')
     main_router.calibration_manager.jog(model.instrument, 3, 'z')
 
+    # Todo: make tests use a tmp folder for writing instead of a real folder
     main_router.calibration_manager.update_container_offset(
         model.container,
         model.instrument

@@ -3,7 +3,6 @@ import sys
 from opentrons.robot.robot import Robot
 from opentrons.instruments import pipette_config
 from opentrons import instruments as inst, containers as cnt
-from opentrons.data_storage import database_migration
 from opentrons._version import __version__
 
 version = sys.version_info[0:2]
@@ -12,7 +11,6 @@ if version < (3, 5):
         'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
             version[0], version[1]))
 
-database_migration.check_version_and_perform_necessary_migrations()
 robot = Robot()
 
 
