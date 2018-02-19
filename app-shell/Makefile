@@ -11,8 +11,39 @@ ui_dir := ../app
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
 
+# build and publish options
+BRANCH_STABLE := master
+BRANCH_EDGE := v3a
+
+# required environment variables for publish
+publish := $(and $(OT_BRANCH),$(OT_BUILD))
+
+ifndef publish
+	channel := local
+else ifeq ($(OT_BRANCH),$(BRANCH_STABLE))
+	channel := stable
+else ifeq ($(OT_BRANCH),$(BRANCH_EDGE))
+	channel := edge
+	suffix := $(channel)-b$(OT_BUILD)
+else
+	channel := $(OT_BRANCH)
+	suffix := $(channel)-b$(OT_BUILD)
+endif
+
+publish_files := "dist/**/opentrons-v*" "dist/**/$(channel)*.@(yml|json)"
+publish_dir := dist/publish
+
+builder := env=production NAME_SUFFIX=$(or $(suffix),$(channel)) \
+	electron-builder --publish=never \
+	-c.publish.bucket=$(OT_BUCKET_RUN_APP) \
+	-c.publish.path=$(OT_FOLDER_RUN_APP) \
+	-c.publish.channel=$(channel)
+
 # standard targets
 #####################################################################
+
+foobar:
+	echo $(eb_opts)
 
 .PHONY: all
 all: clean package
@@ -38,32 +69,32 @@ ui:
 
 .PHONY: package
 package: ui
-	electron-builder --dir
+	$(builder) --dir
 
 .PHONY: dist-posix
 dist-posix: clean ui
-	electron-builder --linux --mac --publish never
+	$(builder) --linux --mac
 	$(MAKE) _dist-collect-artifacts
 
-.PHONY: dist-osx
-dist-osx: clean ui
-	electron-builder --mac --publish never
+.PHONY: dist-mac
+dist-mac: clean ui
+	$(builder) --mac
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
 dist-linux: clean ui
-	electron-builder --linux --publish never
+	$(builder) --linux
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-win
 dist-win: clean ui
-	electron-builder --win --x64 --publish never
+	$(builder) --win
 	$(MAKE) _dist-collect-artifacts
 
 # copy distributable artifacts to the publish directory
 .PHONY: _dist-collect-artifacts
 _dist-collect-artifacts:
-	shx mkdir -p dist/publish && shx cp dist/**/opentrons-v* dist/publish
+	shx mkdir -p dist/publish && shx cp $(publish_files) $(publish_dir)
 
 # development
 #####################################################################

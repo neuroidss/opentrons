@@ -56,11 +56,7 @@ This section details production build instructions for the desktop application.
 
 *   `make` - Default target is "clean package"
 *   `make clean` - Delete the dist folder
-*   `make package` - Package the app for running and inspection (does not create a distributable)
-*   `make dist-mac` - Create a macOS distributable of the app
-*   `make dist-linux` - Create a Linux distributable of the app
-*   `make dist-posix` - Create macOS and Linux apps simultaneously
-*   `make dist-win` - Create a Windows distributable of the app
+*   `make package` - Creates a production package of the app for running and inspection (does not create a distributable)
 
 All packages and/or distributables will be placed in `app-shell/dist`. After running `make package`, you can launch the production app with:
 
@@ -73,6 +69,34 @@ To run the production app in debug mode, set the `DEBUG` environment variable. F
 ```shell
 DEBUG=1 `./dist/mac/Opentrons.app/Contents/MacOS/Opentrons\ Run`
 ```
+
+#### ci
+
+There are a series of tasks designed to be run in CI to create distributable versions of the app.
+
+*   `make dist-mac` - Create a macOS distributable of the app
+*   `make dist-linux` - Create a Linux distributable of the app
+*   `make dist-posix` - Create macOS and Linux apps simultaneously
+*   `make dist-win` - Create a Windows distributable of the app
+
+These tasks need the following environment variables defined:
+
+ name             | description   | why
+----------------- | ------------- | --------------------------------
+OT_BRANCH         | Branch name   | Sets the release channel
+OT_BUILD          | Build number  | Appended to the artifact name
+OT_BUCKET_RUN_APP | AWS S3 bucket | Artifact deploy bucket
+OT_FOLDER_RUN_APP | AWS S3 folder | Artifact deploy folder in bucket
+
+The release channel is set according to:
+
+1. Is the branch `master`?
+    * If yes, channel is `stable`
+2. Is the branch `v3a`?
+    * If yes, channel is `edge`
+3. Are the OT_BRANCH and OT_BUILD defined?
+    * If yes, channel is `${OT_BRANCH}`
+4. Else, channel is `local`
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
