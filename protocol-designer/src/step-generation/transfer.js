@@ -1,6 +1,6 @@
 // @flow
 import type {TransferFormData, RobotState, CommandCreator} from './'
-import {aspirate, dispense, reduceCommandCreators} from './' // blowout, replaceTip, repeatArray, touchTip
+import {aspirate, dispense, replaceTip, reduceCommandCreators} from './' // blowout, repeatArray, touchTip
 import flatMap from 'lodash/flatMap'
 // import range from 'lodash/range'
 import zip from 'lodash/zip'
@@ -47,20 +47,29 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
 
       return flatMap(
         subTransferVolumes,
-        (subTransferVol: number, subTransferIdx: number): Array<CommandCreator> => [
-          aspirate({
-            pipette: data.pipette,
-            volume: subTransferVol, // TODO disposal vol
-            labware: data.sourceLabware,
-            well: sourceWell
-          }),
-          dispense({
-            pipette: data.pipette,
-            volume: subTransferVol, // TODO
-            labware: data.destLabware,
-            well: destWell
-          })
-        ]
+        (subTransferVol: number, subTransferIdx: number): Array<CommandCreator> => {
+          const tipCommands = (
+            (data.changeTip === 'once' && subTransferIdx === 0) ||
+            data.changeTip === 'always')
+              ? [replaceTip(data.pipette)]
+              : []
+
+          return [
+            ...tipCommands,
+            aspirate({
+              pipette: data.pipette,
+              volume: subTransferVol, // TODO disposal vol
+              labware: data.sourceLabware,
+              well: sourceWell
+            }),
+            dispense({
+              pipette: data.pipette,
+              volume: subTransferVol, // TODO
+              labware: data.destLabware,
+              well: destWell
+            })
+          ]
+        }
       )
     }
   )
