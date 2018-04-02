@@ -4,6 +4,7 @@ import blowout from './blowout'
 import consolidate from './consolidate'
 import dispense from './dispense'
 import dropTip from './dropTip'
+import mix from './mix'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
 export * from './robotStateSelectors'
@@ -17,6 +18,7 @@ export {
   consolidate,
   dispense,
   dropTip,
+  mix,
   replaceTip,
   touchTip
 }

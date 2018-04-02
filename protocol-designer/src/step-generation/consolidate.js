@@ -2,26 +2,9 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, repeatArray, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import mix from './mix'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
-
-// TODO factor out createMix helper fn
-function createMix (pipette: string, labware: string, well: string, volume: number, times: number) {
-  return repeatArray([
-    aspirate({
-      pipette,
-      volume,
-      labware,
-      well
-    }),
-    dispense({
-      pipette,
-      volume,
-      labware,
-      well
-    })
-  ], times)
-}
 
 const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -101,7 +84,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         : []
 
       const mixBeforeCommands = (data.mixFirstAspirate)
-        ? createMix(
+        ? mix(
           data.pipette,
           data.sourceLabware,
           sourceWellChunk[0],
@@ -112,7 +95,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
 
       const preWetTipCommands = (data.preWetTip)
         // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
-        ? createMix(
+        ? mix(
           data.pipette,
           data.sourceLabware,
           sourceWellChunk[0],
@@ -122,7 +105,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         : []
 
       const mixAfterCommands = (data.mixInDestination)
-        ? createMix(
+        ? mix(
           data.pipette,
           data.destLabware,
           data.destWell,
