@@ -5,6 +5,24 @@ import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, repeatArray, touchTip, reduceCommandCreators} from './'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
+// TODO factor out createMix helper fn
+function createMix (pipette: string, labware: string, well: string, volume: number, times: number) {
+  return repeatArray([
+    aspirate({
+      pipette,
+      volume,
+      labware,
+      well
+    }),
+    dispense({
+      pipette,
+      volume,
+      labware,
+      well
+    })
+  ], times)
+}
+
 const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
@@ -82,24 +100,6 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         ]
         : []
 
-      // TODO factor out createMix helper fn
-      function createMix (pipette: string, labware: string, well: string, volume: number, times: number) {
-        return repeatArray([
-          aspirate({
-            pipette,
-            volume,
-            labware,
-            well
-          }),
-          dispense({
-            pipette,
-            volume,
-            labware,
-            well
-          })
-        ], times)
-      }
-
       const mixBeforeCommands = (data.mixFirstAspirate)
         ? createMix(
           data.pipette,
@@ -164,14 +164,3 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
 }
 
 export default consolidate
-
-// return { // TODO: figure out where outside consolidate this annotation happens
-//   robotState: robotState,
-//   atomicCommands: {
-//     annotation: {
-//       name: data.name,
-//       description: data.description
-//     },
-//     commands
-//   }
-// }
