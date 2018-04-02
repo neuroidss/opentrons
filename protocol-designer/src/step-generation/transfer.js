@@ -1,9 +1,9 @@
 // @flow
-import type {TransferFormData, RobotState, CommandCreator} from './'
-import {aspirate, dispense, replaceTip, reduceCommandCreators} from './' // blowout, repeatArray, touchTip
 import flatMap from 'lodash/flatMap'
-// import range from 'lodash/range'
 import zip from 'lodash/zip'
+import mix from './mix'
+import {aspirate, dispense, replaceTip, reduceCommandCreators} from './' // blowout, repeatArray, touchTip
+import type {TransferFormData, RobotState, CommandCreator} from './'
 
 const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -35,6 +35,8 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     data.volume / effectiveTransferVol
   )
   const lastSubTransferVol = data.volume - ((chunksPerSubTransfer - 1) * effectiveTransferVol)
+
+  // volume of each chunk in a sub-transfer
   const subTransferVolumes: Array<number> = Array(chunksPerSubTransfer - 1)
     .fill(effectiveTransferVol)
     .concat(lastSubTransferVol)
@@ -47,15 +49,20 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
 
       return flatMap(
         subTransferVolumes,
-        (subTransferVol: number, subTransferIdx: number): Array<CommandCreator> => {
+        (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
           const tipCommands = (
-            (data.changeTip === 'once' && subTransferIdx === 0) ||
+            (data.changeTip === 'once' && chunkIdx === 0) ||
             data.changeTip === 'always')
               ? [replaceTip(data.pipette)]
               : []
 
+          const preWetTipCommands = (data.preWetTip && chunkIdx === 0)
+            ? mix(data.pipette, data.sourceLabware, sourceWell, Math.max(subTransferVol), 1)
+            : []
+
           return [
             ...tipCommands,
+            ...preWetTipCommands,
             aspirate({
               pipette: data.pipette,
               volume: subTransferVol, // TODO disposal vol
