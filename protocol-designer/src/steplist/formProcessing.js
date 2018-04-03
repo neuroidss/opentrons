@@ -6,11 +6,10 @@ import type {
   FormData,
   ProcessedFormData,
   TransferForm,
-  ConsolidateForm,
-  TransferFormData
+  ConsolidateForm
 } from './types'
 
-import type {ConsolidateFormData} from '../step-generation'
+import type {ConsolidateFormData, TransferFormData} from '../step-generation'
 
 // TODO LATER Ian 2018-03-01 remove or consolidate these 2 similar types?
 export type ValidFormAndErrors = {
@@ -58,6 +57,19 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
   const sourceLabware = formData['aspirate--labware']
   const destLabware = formData['dispense--labware']
 
+  // TODO Ian 2018-04-02 several of these fields are the same btw transfer & consolidate, factor 'em out
+
+  const blowout = formData['dispense--blowout--labware']
+
+  const delayAfterDispense = formData['dispense--delay--checkbox']
+    ? ((parseFloat(formData['dispense--delay-minutes']) || 0) * 60) +
+      (parseFloat(formData['dispense--delay-seconds'] || 0))
+    : null
+
+  const changeTip = formData['aspirate--change-tip'] || 'always'
+  // It's radiobutton, so one should always be selected.
+  // TODO use default from importable const DEFAULT_CHANGE_TIP_OPTION
+
   const volume = parseFloat(formData['dispense--volume'])
 
   const requiredFieldErrors = [
@@ -99,7 +111,13 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         destWells,
         sourceLabware,
         destLabware,
-        volume
+        volume,
+        changeTip,
+        blowout,
+        delayAfterDispense,
+
+        description: 'description would be here 2018-03-01', // TODO get from form
+        name: `Transfer ${formData.id}` // TODO real name for steps
       }
       : null
   }

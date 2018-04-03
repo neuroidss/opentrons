@@ -2,7 +2,11 @@
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 import mix from './mix'
-import {aspirate, dispense, replaceTip, reduceCommandCreators} from './' // blowout, repeatArray, touchTip
+import aspirate from './aspirate'
+import dispense from './dispense'
+import replaceTip from './replaceTip'
+import {reduceCommandCreators} from './utils'
+// blowout, repeatArray, touchTip
 import type {TransferFormData, RobotState, CommandCreator} from './'
 
 const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -17,7 +21,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     A single uniform volume will be aspirated from every source well and dispensed into every dest well.
     In other words, all the sub-transfers will use the same uniform volume.
   */
-
+  console.log({data, prevRobotState})
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
@@ -50,7 +54,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
       return flatMap(
         subTransferVolumes,
         (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
-          const tipCommands = (
+          const tipCommands: Array<CommandCreator> = (
             (data.changeTip === 'once' && chunkIdx === 0) ||
             data.changeTip === 'always')
               ? [replaceTip(data.pipette)]

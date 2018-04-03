@@ -1,11 +1,11 @@
 // @flow
 import {getLabwareLiquidState} from '../selectors'
-
+import {TRASH_ID} from '../../step-generation'
 // TODO Ian 2018-03-09 copied from labware-ingred selectors,
 // you should export fixures for each labwareState & ingredLocs
 // then import here instead of copy-paste
 const labwareState = {
-  'FIXED_TRASH_ID': {
+  [TRASH_ID]: {
     type: 'trash-box',
     name: 'Trash',
     slot: '12'
@@ -87,7 +87,7 @@ describe('getLabwareLiquidState', () => {
           '1': {volume: 222}
         }
       },
-      'FIXED_TRASH_ID': {}
+      [TRASH_ID]: {}
     })
   })
 })

@@ -151,7 +151,17 @@ export const robotStateTimeline: BaseState => Array<$Call<StepGeneration.Command
         }
       }
 
-      // TODO don't ignore everything that's not consolidate
+      if (form.validatedForm.stepType === 'transfer') {
+        // TODO Ian 2018-04-02 make DRY, this repeats the above
+        const nextCommandsAndState = StepGeneration.transfer(form.validatedForm)(acc.robotState)
+        return {
+          ...acc,
+          timeline: [...acc.timeline, nextCommandsAndState],
+          robotState: nextCommandsAndState.robotState
+        }
+      }
+
+      // TODO don't ignore everything that's not consolidate/transfer
       return {
         ...acc,
         formErrors: {...acc.formErrors, 'STEP NOT IMPLEMENTED': form.validatedForm.stepType}

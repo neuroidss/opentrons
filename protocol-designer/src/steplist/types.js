@@ -1,6 +1,6 @@
 // @flow
 import type {IconName} from '@opentrons/components'
-import type {ConsolidateFormData} from '../step-generation'
+import type {ConsolidateFormData, TransferFormData} from '../step-generation'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -141,16 +141,6 @@ export type PauseForm = {|
 |}
 
 export type FormData = TransferForm | ConsolidateForm | PauseForm
-
-export type TransferFormData = {|
-  stepType: 'transfer',
-  pipette: string, // pipette ID
-  sourceWells: Array<string>,
-  destWells: Array<string>,
-  sourceLabware: string,
-  destLabware: string,
-  volume: number
-|}
 
 export type PauseFormData = {|
   stepType: 'pause',

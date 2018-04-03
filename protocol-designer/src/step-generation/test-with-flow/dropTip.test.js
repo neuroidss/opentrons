@@ -2,6 +2,7 @@
 import merge from 'lodash/merge'
 import {createRobotState} from './fixtures'
 import dropTip from '../dropTip'
+import {TRASH_ID} from '../constants'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -64,7 +65,7 @@ describe('dropTip', () => {
       expect(result.commands).toEqual([{
         command: 'drop-tip',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       }])
       expect(result.robotState).toEqual(
@@ -86,7 +87,7 @@ describe('dropTip', () => {
       expect(result.commands).toEqual([{
         command: 'drop-tip',
         pipette: 'p300MultiId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       }])
       expect(result.robotState).toEqual(
@@ -117,7 +118,7 @@ describe('dropTip', () => {
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           pipetteId: 'p300MultiId',
-          labwareId: 'trashId',
+          labwareId: TRASH_ID,
           volume: 300, // pipette's max vol
           well: 'A1',
           labwareType: 'fixed-trash',

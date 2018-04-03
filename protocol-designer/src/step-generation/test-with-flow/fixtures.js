@@ -4,7 +4,7 @@ import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import {tiprackWellNamesFlat} from '../'
+import {tiprackWellNamesFlat, TRASH_ID} from '../'
 import type {RobotState, PipetteData, LabwareData} from '../'
 
 // Eg {A1: true, B1: true, ...}
@@ -92,7 +92,7 @@ export function createEmptyLiquidState (args: {
     labware: {
       ...sourceLabware,
       ...destLabware,
-      trashId: {A1: {}}
+      [TRASH_ID]: {A1: {}}
     }
   }
 }
@@ -154,7 +154,7 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
       type: args.sourcePlateType,
       name: 'Source Plate'
     },
-    trashId: {
+    [TRASH_ID]: {
       slot: '12',
       type: 'fixed-trash',
       name: 'Trash'

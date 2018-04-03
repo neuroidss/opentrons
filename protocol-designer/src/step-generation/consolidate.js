@@ -1,8 +1,7 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators, TRASH_ID} from './'
 import mix from './mix'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
@@ -77,7 +76,11 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         ? [
           blowout({
             pipette: data.pipette,
+<<<<<<< 5dee666ca4afe4ab4fa76934870cd8e8e5bd098e
             labware: FIXED_TRASH_ID,
+=======
+            labware: TRASH_ID,
+>>>>>>> use TRASH_ID for fixed trash labware id
             well: 'A1'
           })
         ]

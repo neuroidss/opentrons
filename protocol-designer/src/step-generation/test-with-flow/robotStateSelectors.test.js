@@ -1,6 +1,6 @@
 // @flow
 import {p300Single, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
+import {sortLabwareBySlot, getNextTiprack, _getNextTip, TRASH_ID} from '../'
 
 // just a blank liquidState to appease flow
 const basicLiquidState = {
@@ -139,7 +139,7 @@ describe('getNextTiprack - single-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -182,7 +182,7 @@ describe('getNextTiprack - single-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -229,7 +229,7 @@ describe('getNextTiprack - single-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -284,7 +284,7 @@ describe('getNextTiprack - single-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -341,7 +341,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -386,7 +386,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -430,7 +430,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -472,7 +472,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -540,7 +540,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -603,7 +603,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'
@@ -693,7 +693,7 @@ describe('getNextTiprack - 8-channel', () => {
           type: '96-flat',
           name: 'Destination Plate'
         },
-        trashId: {
+        [TRASH_ID]: {
           slot: '12',
           type: 'fixed-trash',
           name: 'Trash'

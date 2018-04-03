@@ -11,7 +11,7 @@ import reduce from 'lodash/reduce'
 
 import {getMaxVolumes, defaultContainers, sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils.js'
-
+import {TRASH_ID} from '../../step-generation'
 import type {DeckSlot} from '@opentrons/components'
 
 import {
@@ -85,8 +85,8 @@ type ContainersState = {
 }
 
 const initialLabwareState = {
-  [FIXED_TRASH_ID]: {
-    id: FIXED_TRASH_ID,
+  [TRASH_ID]: {
+    id: TRASH_ID,
     type: 'trash-box', // TODO Ian 2018-03-23 Change to 'fixed-trash' using new defs
     name: 'Trash',
     slot: '12'

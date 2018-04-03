@@ -1,7 +1,7 @@
 // @flow
 import merge from 'lodash/merge'
 import {createRobotState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {replaceTip} from '../'
+import {replaceTip, TRASH_ID} from '../'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -172,7 +172,7 @@ describe('replaceTip', () => {
         {
           command: 'drop-tip',
           pipette: 'p300SingleId',
-          labware: 'trashId',
+          labware: TRASH_ID,
           well: 'A1'
         },
         {
@@ -333,7 +333,7 @@ describe('replaceTip', () => {
         {
           command: 'drop-tip',
           pipette: 'p300MultiId',
-          labware: 'trashId',
+          labware: TRASH_ID,
           well: 'A1'
         },
         {

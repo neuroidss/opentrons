@@ -1,5 +1,5 @@
 import {selectors} from '../reducers'
-
+import {TRASH_ID} from '../../step-generation'
 // FIXTURES
 
 const baseIngredFields = {
@@ -19,7 +19,7 @@ const baseIngredFields2 = {
 }
 
 const containerState = {
-  'FIXED_TRASH_ID': {
+  [TRASH_ID]: {
     type: 'trash-box',
     name: 'Trash',
     slot: '12'
@@ -123,7 +123,7 @@ const ingredsByLabwareXXSingleIngred = {
   },
   'container2Id': {},
   'container3Id': {},
-  'FIXED_TRASH_ID': {}
+  [TRASH_ID]: {}
 }
 
 const ingredsByLabwareXXTwoIngred = {
@@ -159,7 +159,7 @@ const ingredsByLabwareXXTwoIngred = {
       }
     }
   },
-  'FIXED_TRASH_ID': {}
+  [TRASH_ID]: {}
 }
 
 const defaultWellContents = {
@@ -251,7 +251,7 @@ describe('wellContentsAllLabware', () => {
     expect(
       singleIngredResult
     ).toMatchObject({
-      'FIXED_TRASH_ID': {
+      [TRASH_ID]: {
         A1: defaultWellContents
       },
       container2Id: {

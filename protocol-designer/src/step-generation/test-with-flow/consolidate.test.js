@@ -1,7 +1,7 @@
 // @flow
 import merge from 'lodash/merge'
 import {createRobotStateFixture, createEmptyLiquidState, getTipColumn, getTiprackTipstate} from './fixtures'
-import {consolidate} from '../'
+import {consolidate, TRASH_ID} from '../'
 
 const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
@@ -221,7 +221,7 @@ describe('consolidate single-channel', () => {
       {
         command: 'drop-tip',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       {
@@ -429,7 +429,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       {
@@ -457,7 +457,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       }
     ])
@@ -700,7 +700,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       // Start mix
@@ -772,7 +772,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       }
     ])
@@ -935,7 +935,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: {times: 3, volume: 54},
-      blowout: 'trashId'
+      blowout: TRASH_ID
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -1021,7 +1021,7 @@ describe('consolidate single-channel', () => {
       {
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       {
@@ -1085,7 +1085,7 @@ describe('consolidate single-channel', () => {
       {
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       }
     ])
@@ -1135,7 +1135,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       // Now, mix in the dest well
@@ -1207,7 +1207,7 @@ describe('consolidate single-channel', () => {
         // Trash the disposal volume
         command: 'blowout',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       // Now, mix in the dest well

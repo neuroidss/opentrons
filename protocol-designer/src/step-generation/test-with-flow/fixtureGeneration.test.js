@@ -1,5 +1,6 @@
 // @flow
 import {createRobotState, createEmptyLiquidState, getTiprackTipstate} from './fixtures'
+import {TRASH_ID} from '../constants'
 
 describe('createEmptyLiquidState fixture generator', () => {
   test('labware', () => {
@@ -34,7 +35,7 @@ describe('createEmptyLiquidState fixture generator', () => {
       A12: {}
     })
 
-    expect(result.labware.trashId).toEqual({A1: {}})
+    expect(result.labware[TRASH_ID]).toEqual({A1: {}})
   })
 })
 

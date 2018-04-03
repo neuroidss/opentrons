@@ -7,8 +7,10 @@ import dropTip from './dropTip'
 import mix from './mix'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
+import transfer from './transfer'
 export * from './robotStateSelectors'
 export * from './types'
+export * from './constants'
 export * from './data'
 export * from './utils'
 
@@ -20,5 +22,6 @@ export {
   dropTip,
   mix,
   replaceTip,
-  touchTip
+  touchTip,
+  transfer
 }

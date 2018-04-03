@@ -2,6 +2,7 @@
 import merge from 'lodash/merge'
 import {createRobotState} from './fixtures' // getTipColumn, getTiprackTipstate, createEmptyLiquidState
 import transfer from '../transfer'
+import {TRASH_ID} from '../constants'
 
 let transferArgs
 let robotInitialState
@@ -33,6 +34,54 @@ beforeEach(() => {
     tipracks: [200],
     fillPipetteTips: true,
     fillTiprackTips: true
+  })
+})
+
+describe('pick up tip if no tip on pipette', () => {
+  beforeEach(() => {
+    transferArgs = {
+      ...transferArgs,
+      sourceWells: ['A1'],
+      destWells: ['B2'],
+      volume: 30
+    }
+
+    // no tip on pipette
+    robotInitialState.tipState.pipettes.p300SingleId = false
+  })
+
+  const changeTipOptions = ['once', 'always']
+
+  changeTipOptions.forEach(changeTip => {
+    test(`...${changeTip}`, () => {
+      transferArgs = {
+        ...transferArgs,
+        changeTip
+      }
+
+      const result = transfer(transferArgs)(robotInitialState)
+
+      expect(result.commands[0]).toEqual(
+        {
+          command: 'pick-up-tip',
+          pipette: 'p300SingleId',
+          labware: 'tiprack1Id',
+          well: 'A1'
+        }
+      )
+    })
+  })
+
+  test('...never (should not pick up tip, and fail)', () => {
+    transferArgs = {
+      ...transferArgs,
+      changeTip: 'never'
+    }
+
+    expect(
+      // $FlowFixMe // TODO Ian 2018-04-02: here, flow doesn't like transferArgs fields
+      () => transfer(transferArgs)(robotInitialState)
+    ).toThrow(/Attempted to aspirate with no tip.*/)
   })
 })
 
@@ -234,7 +283,7 @@ describe('single transfer exceeding pipette max', () => {
       {
         command: 'drop-tip',
         pipette: 'p300SingleId',
-        labware: 'trashId',
+        labware: TRASH_ID,
         well: 'A1'
       },
       {
@@ -267,7 +316,7 @@ describe('single transfer exceeding pipette max', () => {
         labware: {
           sourcePlateId: {A1: {'0': {volume: 400 - 350}}},
           destPlateId: {B2: {'0': {volume: 350}}},
-          trashId: result.robotState.liquidState.labware.trashId // Ignore liquid contents of trash. TODO LATER make this more elegant
+          [TRASH_ID]: result.robotState.liquidState.labware[TRASH_ID] // Ignore liquid contents of trash. TODO LATER make this more elegant
         },
         pipettes: {
           p300SingleId: {'0': {'0': {volume: 0}}} // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
