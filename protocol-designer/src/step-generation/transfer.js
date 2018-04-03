@@ -54,6 +54,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
       return flatMap(
         subTransferVolumes,
         (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
+          // TODO IMMEDIATELY disposal vol ^^^
           const tipCommands: Array<CommandCreator> = (
             (data.changeTip === 'once' && chunkIdx === 0) ||
             data.changeTip === 'always')
@@ -69,13 +70,13 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ...preWetTipCommands,
             aspirate({
               pipette: data.pipette,
-              volume: subTransferVol, // TODO disposal vol
+              volume: subTransferVol,
               labware: data.sourceLabware,
               well: sourceWell
             }),
             dispense({
               pipette: data.pipette,
-              volume: subTransferVol, // TODO
+              volume: subTransferVol,
               labware: data.destLabware,
               well: destWell
             })

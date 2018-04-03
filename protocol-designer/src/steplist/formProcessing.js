@@ -116,6 +116,9 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         blowout,
         delayAfterDispense,
 
+        mixFirstAspirate: null, // TODO IMMEDIATELY
+        mixInDestination: null, // TODO IMMEDIATELY
+        disposalVolume: 0, // TODO IMMEDIATELY
         description: 'description would be here 2018-03-01', // TODO get from form
         name: `Transfer ${formData.id}` // TODO real name for steps
       }
