@@ -26,7 +26,7 @@ export const getMaxVolumes = (containerType: string): WellVolumes => {
   if (cont) {
     return reduce(
       cont.locations,
-      (acc, wellData: JsonWellData, wellName): WellVolumes => ({
+      (acc: WellVolumes, wellData: JsonWellData, wellName: string): WellVolumes => ({
         ...acc,
         [wellName]: wellData['total-liquid-volume']
       }),
