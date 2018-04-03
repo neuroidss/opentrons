@@ -93,7 +93,7 @@ export type TransferFormData = {|
   */
   changeTip: ChangeTipOptions,
   /** Mix in first well in chunk */
-  mixFirstAspirate: ?MixArgs,
+  mixBeforeAspirate: ?MixArgs,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: ?number,
 

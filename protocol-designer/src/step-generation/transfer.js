@@ -6,7 +6,8 @@ import aspirate from './aspirate'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import {reduceCommandCreators} from './utils'
-// blowout, repeatArray, touchTip
+// blowout, repeatArray
+import touchTip from './touchTip'
 import type {TransferFormData, RobotState, CommandCreator} from './'
 
 const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
@@ -65,21 +66,61 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ? mix(data.pipette, data.sourceLabware, sourceWell, Math.max(subTransferVol), 1)
             : []
 
+          const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
+            ? mix(
+              data.pipette,
+              data.sourceLabware,
+              sourceWell,
+              data.mixBeforeAspirate.volume,
+              data.mixBeforeAspirate.times
+            )
+            : []
+
+          const touchTipAfterAspirateCommands = (data.touchTipAfterAspirate)
+            ? [touchTip({
+              pipette: data.pipette,
+              labware: data.sourceLabware,
+              well: sourceWell
+            })]
+            : []
+
+          const touchTipAfterDispenseCommands = (data.touchTipAfterDispense)
+            ? [touchTip({
+              pipette: data.pipette,
+              labware: data.destLabware,
+              well: destWell
+            })]
+            : []
+
+          const mixInDestinationCommands = (data.mixInDestination)
+            ? mix(
+              data.pipette,
+              data.destLabware,
+              destWell,
+              data.mixInDestination.volume,
+              data.mixInDestination.times
+            )
+            : []
+
           return [
             ...tipCommands,
             ...preWetTipCommands,
+            ...mixBeforeAspirateCommands,
             aspirate({
               pipette: data.pipette,
               volume: subTransferVol,
               labware: data.sourceLabware,
               well: sourceWell
             }),
+            ...touchTipAfterAspirateCommands,
             dispense({
               pipette: data.pipette,
               volume: subTransferVol,
               labware: data.destLabware,
               well: destWell
-            })
+            }),
+            ...touchTipAfterDispenseCommands,
+            ...mixInDestinationCommands
           ]
         }
       )

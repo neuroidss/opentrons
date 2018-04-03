@@ -20,7 +20,7 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: null,
-    mixFirstAspirate: null,
+    mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
@@ -451,15 +451,276 @@ describe('advanced options', () => {
       ])
     })
 
-    test('touch-tip after aspirate should touch-tip on each source well, for every aspirate')
-    test('mix before aspirate')
+    test('touch-tip after aspirate should touch-tip on each source well, for every aspirate', () => {
+      transferArgs = {
+        ...transferArgs,
+        volume: 350,
+        touchTipAfterAspirate: true
+      }
+
+      const result = transfer(transferArgs)(robotInitialState)
+      expect(result.commands).toEqual([
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'A1'
+        },
+        {
+          command: 'touch-tip',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'B1'
+        },
+
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'A1'
+        },
+        {
+          command: 'touch-tip',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'B1'
+        }
+      ])
+    })
+
+    test('touch-tip after dispense should touch-tip on each dest well, for every dispense', () => {
+      transferArgs = {
+        ...transferArgs,
+        volume: 350,
+        touchTipAfterDispense: true
+      }
+
+      const result = transfer(transferArgs)(robotInitialState)
+      expect(result.commands).toEqual([
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'B1'
+        },
+        {
+          command: 'touch-tip',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          well: 'B1'
+        },
+
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'B1'
+        },
+        {
+          command: 'touch-tip',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          well: 'B1'
+        }
+      ])
+    })
+
+    test('mix before aspirate', () => {
+      transferArgs = {
+        ...transferArgs,
+        volume: 350,
+        mixBeforeAspirate: {
+          volume: 250,
+          times: 2
+        }
+      }
+
+      // helper fn for less verbose `commands` below
+      const mixCommands = [
+        // mix 1
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'A1'
+        },
+        // mix 2
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'A1'
+        }
+      ]
+
+      const result = transfer(transferArgs)(robotInitialState)
+      expect(result.commands).toEqual([
+        ...mixCommands,
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'B1'
+        },
+
+        ...mixCommands,
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'B1'
+        }
+      ])
+    })
     test('air gap => ???') // TODO determine behavior
     test('disposal volume => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {
-    test('mix after dispense')
-    test('delay after dispense')
-    test('blowout should blowout in specified labware after each dispense')
+    test('mix after dispense', () => {
+      transferArgs = {
+        ...transferArgs,
+        volume: 350,
+        mixInDestination: {
+          volume: 250,
+          times: 2
+        }
+      }
+
+      // helper fn for less verbose `commands` below
+      const mixCommands = [
+        // mix 1
+        {
+          command: 'aspirate',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'B1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'B1'
+        },
+        // mix 2
+        {
+          command: 'aspirate',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'B1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 250,
+          well: 'B1'
+        }
+      ]
+
+      const result = transfer(transferArgs)(robotInitialState)
+      expect(result.commands).toEqual([
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 300,
+          well: 'B1'
+        },
+        ...mixCommands,
+
+        {
+          command: 'aspirate',
+          labware: 'sourcePlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'A1'
+        },
+        {
+          command: 'dispense',
+          labware: 'destPlateId',
+          pipette: 'p300SingleId',
+          volume: 50,
+          well: 'B1'
+        },
+        ...mixCommands
+      ])
+    })
+    test('delay after dispense') // TODO
+    test('blowout should blowout in specified labware after each dispense') // TODO
   })
 })

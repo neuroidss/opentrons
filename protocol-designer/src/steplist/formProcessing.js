@@ -130,7 +130,7 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         blowout,
         delayAfterDispense,
 
-        mixFirstAspirate: getMixData(
+        mixBeforeAspirate: getMixData(
           formData,
           'aspirate--mix--checkbox',
           'aspirate--mix--volume',
