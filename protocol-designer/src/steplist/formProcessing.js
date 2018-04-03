@@ -22,6 +22,16 @@ type ValidationAndErrors<F> = {
   validatedForm: F | null
 }
 
+function getMixData (formData, checkboxField, volumeField, timesField) {
+  // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
+  const checkbox = formData[checkboxField]
+  const volume = parseFloat(formData[volumeField])
+  const times = parseInt(formData[timesField])
+  return (checkbox && volume > 0 && times > 0)
+    ? {volume, times}
+    : null
+}
+
 export const generateNewForm = (stepId: StepIdType, stepType: StepType) => {
   // Add default values to a new step form
   const baseForm = {
@@ -72,6 +82,10 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
 
   const volume = parseFloat(formData['dispense--volume'])
 
+  const disposalVolume = formData['aspirate--disposal-vol--checkbox']
+    ? (parseFloat(formData['aspirate--disposal-vol--volume']) || null)
+    : null
+
   const requiredFieldErrors = [
     'aspirate--pipette',
     'aspirate--labware',
@@ -116,11 +130,27 @@ function _vapTransfer (formData: TransferForm): ValidationAndErrors<TransferForm
         blowout,
         delayAfterDispense,
 
-        mixFirstAspirate: null, // TODO IMMEDIATELY
-        mixInDestination: null, // TODO IMMEDIATELY
-        disposalVolume: 0, // TODO IMMEDIATELY
-        description: 'description would be here 2018-03-01', // TODO get from form
-        name: `Transfer ${formData.id}` // TODO real name for steps
+        mixFirstAspirate: getMixData(
+          formData,
+          'aspirate--mix--checkbox',
+          'aspirate--mix--volume',
+          'aspirate--mix--times'
+        ),
+
+        mixInDestination: getMixData(
+          formData,
+          'dispense--mix--checkbox',
+          'dispense--mix--volume',
+          'dispense--mix--times'
+        ),
+
+        disposalVolume,
+        preWetTip: !!(formData['aspirate--pre-wet-tip']),
+        touchTipAfterAspirate: !!(formData['aspirate--touch-tip']),
+        touchTipAfterDispense: false, // TODO Ian 2018-04-03 field not in form
+
+        description: 'description would be here TODO', // TODO Ian 2018-03-01 get from form
+        name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
       }
       : null
   }
@@ -167,7 +197,7 @@ function _vapConsolidate (formData: ConsolidateForm): ValidationAndErrors<Consol
   const mixFirstAspirate = formData['aspirate--mix--checkbox']
     ? {
       volume: parseFloat(formData['aspirate--mix--volume']),
-      times: parseInt(formData['aspirate--mix--time']) // TODO handle unparseable
+      times: parseInt(formData['aspirate--mix--times']) // TODO handle unparseable
     }
     : null
 

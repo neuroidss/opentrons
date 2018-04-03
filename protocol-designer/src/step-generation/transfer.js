@@ -21,7 +21,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     A single uniform volume will be aspirated from every source well and dispensed into every dest well.
     In other words, all the sub-transfers will use the same uniform volume.
   */
-  console.log({data, prevRobotState})
+
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
