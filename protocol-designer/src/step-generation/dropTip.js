@@ -1,6 +1,5 @@
 // @flow
 import type {CommandCreator, RobotState} from './'
-import {FIXED_TRASH_ID} from '../constants'
 import cloneDeep from 'lodash/cloneDeep'
 import updateLiquidState from './dispenseUpdateLiquidState'
 import {TRASH_ID} from './constants'

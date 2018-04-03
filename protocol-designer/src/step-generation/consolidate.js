@@ -76,11 +76,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
         ? [
           blowout({
             pipette: data.pipette,
-<<<<<<< 5dee666ca4afe4ab4fa76934870cd8e8e5bd098e
-            labware: FIXED_TRASH_ID,
-=======
             labware: TRASH_ID,
->>>>>>> use TRASH_ID for fixed trash labware id
             well: 'A1'
           })
         ]

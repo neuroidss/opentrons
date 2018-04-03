@@ -9,7 +9,7 @@ import pick from 'lodash/pick'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
-import {getMaxVolumes, defaultContainers, sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
+import {getMaxVolumes, defaultContainers, sortedSlotnames} from '../../constants.js'
 import {uuid} from '../../utils.js'
 import {TRASH_ID} from '../../step-generation'
 import type {DeckSlot} from '@opentrons/components'
