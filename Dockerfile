@@ -14,6 +14,7 @@ ENV PATH=$PATH:/data/packages/usr/local/bin
 # Port name for connecting to smoothie over serial, i.e. /dev/ttyAMA0
 ENV OT_SMOOTHIE_ID=AMA
 ENV OT_SERVER_PORT=31950
+ENV OT_UPDATE_PORT=34000
 # File path to unix socket API server is listening
 ENV OT_SERVER_UNIX_SOCKET_PATH=/tmp/aiohttp.sock
 
