@@ -644,7 +644,7 @@ class Pipette:
         return self
 
     @commands.publish.both(command=commands.blow_out)
-    def blow_out(self, location=None):
+    def blow_out(self, location=None, rate=1.0):
         """
         Force any remaining liquid to dispense, by moving
         this pipette's plunger to the calibrated `blow_out` position
@@ -660,6 +660,11 @@ class Pipette:
             The :any:`Placeable` (:any:`Well`) to perform the blow_out.
             Can also be a tuple with first item :any:`Placeable`,
             second item relative :any:`Vector`
+
+        rate : float
+            Set plunger speed for this blow-out, where
+            speed = rate * (aspirate_speed or dispense_speed)
+            (see :meth:`set_speed`)
 
         Returns
         -------
@@ -677,10 +682,15 @@ class Pipette:
             log.warning("Cannot 'blow out' without a tip attached.")
 
         self.move_to(location)
+
+        speed = self.speeds['dispense'] * rate
+        self.instrument_actuator.push_speed()
+        self.instrument_actuator.set_speed(speed)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=self._get_plunger_position('blow_out')
         )
+        self.instrument_actuator.pop_speed()
         self.current_volume = 0
 
         return self
