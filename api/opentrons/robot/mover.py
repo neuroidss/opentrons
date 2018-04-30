@@ -8,10 +8,14 @@ class Mover:
         self._axis_maximum = {'x': None, 'y': None, 'z': None}
         self._dst = dst
         self._src = src
+        self.needs_to_home = True
 
     def jog(self, pose_tree, axis, distance):
         assert axis in 'xyz', "axis value should be x, y or z"
         assert axis in self._axis_mapping, "mapping is not set for " + axis
+
+        if self.needs_to_home:
+            self.home(pose_tree)
 
         x, y, z = change_base(pose_tree, src=self)
 
@@ -37,6 +41,9 @@ class Mover:
             _y = _y if y is not None else 0
             _z = _z if z is not None else 0
             return _x, _y, _z
+
+        if self.needs_to_home:
+            self.home(pose_tree)
 
         dst_x, dst_y, dst_z = change_base(
             pose_tree,
@@ -64,6 +71,7 @@ class Mover:
 
     def home(self, pose_tree):
         self._driver.home(axis=''.join(self._axis_mapping.values()))
+        self.needs_to_home = False
         return self.update_pose_from_driver(pose_tree)
 
     def fast_home(self, pose_tree, safety_margin):
@@ -71,6 +79,7 @@ class Mover:
             axis=''.join(self._axis_mapping.values()),
             safety_margin=safety_margin
         )
+        self.needs_to_home = False
         return self.update_pose_from_driver(pose_tree)
 
     def set_speed(self, value):
@@ -96,6 +105,9 @@ class Mover:
 
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis
+
+        if self.needs_to_home:
+            self.home(pose_tree)
 
         if axis in self._axis_mapping:
             self._driver.probe_axis(self._axis_mapping[axis], movement)
